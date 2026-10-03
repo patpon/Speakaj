@@ -13,6 +13,19 @@ def _paste_modifier():
     return Key.cmd if sys.platform == "darwin" else Key.ctrl
 
 
+def _paste_key():
+    """The physical V key. Pressing the character "v" fails when a non-Latin
+    layout (e.g. Thai Kedmanee) is active: pynput can't find "v" on that layout
+    and types it as a unicode character, so Ctrl+V never reaches the app."""
+    from pynput.keyboard import KeyCode
+
+    if sys.platform == "win32":
+        return KeyCode.from_vk(0x56)  # VK_V
+    if sys.platform == "darwin":
+        return KeyCode.from_vk(9)  # kVK_ANSI_V
+    return "v"
+
+
 def insert_text(text: str, mode: str = "paste", restore_clipboard: bool = True) -> None:
     if not text:
         return
@@ -34,9 +47,10 @@ def insert_text(text: str, mode: str = "paste", restore_clipboard: bool = True) 
 
     pyperclip.copy(text)
     time.sleep(0.05)
+    key = _paste_key()
     with keyboard.pressed(_paste_modifier()):
-        keyboard.press("v")
-        keyboard.release("v")
+        keyboard.press(key)
+        keyboard.release(key)
 
     if previous is not None:
         # Give the target app time to read the clipboard before restoring it.

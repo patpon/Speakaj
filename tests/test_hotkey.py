@@ -50,3 +50,12 @@ def test_toggle():
     h._on_press(KeyCode.from_char("a"))  # typing during toggle mode is fine
     h._on_press(Key.f9)
     assert events == ["start", "stop"]
+
+
+def test_paste_key_is_layout_independent(monkeypatch):
+    from speakaj import inserter
+
+    monkeypatch.setattr(inserter.sys, "platform", "win32")
+    assert inserter._paste_key().vk == 0x56
+    monkeypatch.setattr(inserter.sys, "platform", "darwin")
+    assert inserter._paste_key().vk == 9
