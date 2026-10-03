@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speakaj — แค่พูด ไม่ต้องพิมพ์</title>
+<meta name="description" content="โปรแกรมพิมพ์ด้วยเสียงภาษาไทย + English สำหรับ Windows และ macOS กดค้าง พูด ปล่อย ข้อความพิมพ์ให้ทันที">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;700&display=swap">
+<style>
+:root{--bg:#fff;--fg:#0f172a;--muted:#64748b;--line:#e2e8f0;--soft:#f1f5ff;--blue:#2563eb;--blue-d:#1d4ed8}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.65 "IBM Plex Sans Thai",system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+nav{display:flex;justify-content:space-between;align-items:center;height:64px}
+.logo{font-weight:700;font-size:20px;display:flex;gap:8px;align-items:center}
+.logo i{width:28px;height:28px;border-radius:8px;background:var(--blue);display:grid;place-items:center;color:#fff;font-style:normal;font-size:15px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:500;border:1px solid var(--line);transition:.15s}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.primary:hover{background:var(--blue-d)}
+.btn:hover{transform:translateY(-1px)}
+.hero{text-align:center;padding:72px 0 56px}
+.tag{display:inline-block;padding:4px 14px;border-radius:999px;background:var(--soft);color:var(--blue);font-size:14px;font-weight:500;margin-bottom:20px}
+h1{font-size:clamp(40px,7vw,68px);line-height:1.15;letter-spacing:-.02em}
+h1 span{color:var(--blue)}
+.lead{color:var(--muted);font-size:19px;max-width:600px;margin:20px auto 32px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.demo{margin:56px auto 0;max-width:640px;border:1px solid var(--line);border-radius:20px;padding:24px;text-align:left;box-shadow:0 20px 50px -20px rgba(37,99,235,.25)}
+.pill{display:inline-flex;align-items:center;gap:10px;background:var(--fg);color:#fff;border-radius:999px;padding:8px 16px;font-size:14px}
+.bars{display:flex;gap:3px;align-items:center;height:16px}
+.bars b{width:3px;background:#60a5fa;border-radius:2px;animation:w 1s infinite ease-in-out}
+.bars b:nth-child(2){animation-delay:.15s}.bars b:nth-child(3){animation-delay:.3s}.bars b:nth-child(4){animation-delay:.45s}
+@keyframes w{0%,100%{height:4px}50%{height:16px}}
+.said{color:var(--muted);font-size:15px;margin:16px 0 6px;text-decoration:line-through;text-decoration-color:#cbd5e1}
+.typed{font-size:18px}
+section{padding:64px 0}
+h2{font-size:clamp(28px,4vw,38px);text-align:center;margin-bottom:40px}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{border:1px solid var(--line);border-radius:16px;padding:24px}
+.card .n{width:36px;height:36px;border-radius:10px;background:var(--soft);color:var(--blue);display:grid;place-items:center;font-weight:700;margin-bottom:14px;font-size:18px}
+.card h3{font-size:18px;margin-bottom:6px}
+.card p{color:var(--muted);font-size:15px}
+kbd{border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:1px 7px;font-size:13px;background:#fff}
+.apps{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.apps span{border:1px solid var(--line);border-radius:999px;padding:8px 18px;font-size:15px}
+.alt{background:var(--soft)}
+.dl{text-align:center}
+.dl p{color:var(--muted);margin:-24px 0 28px}
+footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#"><i>🎙</i>Speakaj</a>
+    <a class="btn" href="https://github.com/patpon/Speakaj">GitHub</a>
+  </nav>
+
+  <header class="hero">
+    <div class="tag">ภาษาไทย + English · Windows & macOS</div>
+    <h1>แค่พูด<br><span>ไม่ต้องพิมพ์</span></h1>
+    <p class="lead">กดปุ่มค้าง พูด แล้วปล่อย — Speakaj แปลงเสียงเป็นข้อความที่เกลาเรียบร้อย พิมพ์ลงทุกโปรแกรมให้ทันที เร็วกว่าพิมพ์ 3 เท่า</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/patpon/Speakaj/releases/latest">⬇ ดาวน์โหลดฟรี</a>
+      <a class="btn" href="#how">ดูวิธีใช้</a>
+    </div>
+
+    <div class="demo">
+      <div class="pill"><div class="bars"><b></b><b></b><b></b><b></b></div>กำลังฟัง…</div>
+      <p class="said">“เอ่อ พรุ่งนี้ อืม ประชุมสาขา ตอนบ่ายสองนะครับ แล้วก็ ส่ง report ยอดขาย มาก่อนเที่ยง”</p>
+      <p class="typed">พรุ่งนี้ประชุมสาขาตอนบ่ายสองนะครับ แล้วก็ส่ง report ยอดขายมาก่อนเที่ยง</p>
+    </div>
+  </header>
+</div>
+
+<section id="how" class="alt">
+  <div class="wrap">
+    <h2>ใช้ง่าย 3 ขั้นตอน</h2>
+    <div class="grid">
+      <div class="card"><div class="n">1</div><h3>กดค้าง</h3><p>กด <kbd>Ctrl ขวา</kbd> ค้างไว้ หรือกด <kbd>F9</kbd> หนึ่งครั้งเพื่อพูดยาวๆ แบบไม่ต้องกดค้าง</p></div>
+      <div class="card"><div class="n">2</div><h3>พูดตามธรรมชาติ</h3><p>พูดไทยปนอังกฤษได้เลย ไม่ต้องพูดช้า ไม่ต้องบอกวรรคตอน</p></div>
+      <div class="card"><div class="n">3</div><h3>ปล่อยปุ่ม</h3><p>ข้อความที่ตัด “เอ่อ / อืม” และใส่วรรคตอนแล้ว ถูกพิมพ์ลงช่องที่เคอร์เซอร์อยู่ทันที</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>ใช้ได้กับทุกโปรแกรม</h2>
+    <div class="apps">
+      <span>LINE</span><span>Microsoft Word</span><span>Excel</span><span>Gmail</span><span>Outlook</span>
+      <span>Google Docs</span><span>ChatGPT</span><span>Claude</span><span>Facebook</span><span>Notion</span><span>Slack</span><span>VS Code</span>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <h2>ทำไมต้อง Speakaj</h2>
+    <div class="grid">
+      <div class="card"><div class="n">🇹🇭</div><h3>เข้าใจภาษาไทยจริง</h3><p>ใช้ Whisper large-v3 แยกไทย-อังกฤษอัตโนมัติ ใส่คำเฉพาะของบริษัทได้</p></div>
+      <div class="card"><div class="n">🧹</div><h3>เกลาข้อความด้วย AI</h3><p>Claude ตัดคำฟุ่มเฟือย แก้คำซ้ำ ใส่วรรคตอน ปรับให้สุภาพตามที่สั่ง</p></div>
+      <div class="card"><div class="n">⚡</div><h3>เร็ว</h3><p>ข้อความขึ้นภายใน 1–2 วินาทีหลังปล่อยปุ่ม ไม่ต้องสลับหน้าต่าง</p></div>
+      <div class="card"><div class="n">🔒</div><h3>เป็นส่วนตัว</h3><p>API key และประวัติเก็บในเครื่องคุณเท่านั้น ไม่มี server กลาง ไม่ต้องสมัครสมาชิก</p></div>
+      <div class="card"><div class="n">📊</div><h3>สถิติรายสัปดาห์</h3><p>ดูว่าพูดไปกี่คำ ประหยัดเวลาพิมพ์ไปเท่าไหร่ จากไอคอนบน taskbar</p></div>
+      <div class="card"><div class="n">💸</div><h3>ฟรี & Open source</h3><p>ใช้ Groq free tier ได้ จ่ายเฉพาะที่ใช้จริง โค้ดเปิดให้ดูทั้งหมดบน GitHub</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="dl">
+  <div class="wrap">
+    <h2>เริ่มใช้งานวันนี้</h2>
+    <p>ดาวน์โหลด แตกไฟล์ ใส่ API key ครั้งเดียว — เสร็จ</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-windows.zip">🪟 Windows</a>
+      <a class="btn primary" href="https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-macos.zip"> macOS</a>
+      <a class="btn" href="https://github.com/patpon/Speakaj#readme">คู่มือติดตั้ง</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">Speakaj · Open source (MIT) · <a href="https://github.com/patpon/Speakaj">github.com/patpon/Speakaj</a></div>
+</footer>
+</body>
+</html>

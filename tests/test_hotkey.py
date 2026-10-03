@@ -1,6 +1,6 @@
 import pytest
 
-pytest.importorskip("pynput")
+pytest.importorskip("pynput.keyboard", exc_type=ImportError)  # also skips on headless Linux
 
 from pynput.keyboard import Key, KeyCode  # noqa: E402
 
