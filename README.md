@@ -143,7 +143,7 @@ python build.py           # สร้าง dist/Speakaj(.exe/.app) ด้วย
 
 โครงสร้าง: `recorder` (อัดเสียง) → `transcriber` (Groq/OpenAI Whisper) → `cleaner` (Claude) → `inserter` (วางข้อความ) · ควบคุมโดย `app.py` + `hotkey.py`
 
-Release: push tag `v0.1.0` → GitHub Actions สร้างไฟล์ Windows/macOS ขึ้น Releases ให้อัตโนมัติ
+Release: กด Publish release ที่ GitHub (tag เช่น `v0.2.0`) → GitHub Actions สร้างไฟล์ Windows/macOS แนบให้อัตโนมัติ
 
 ## License
 
