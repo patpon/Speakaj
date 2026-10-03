@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import logging
+
 import requests
+
+log = logging.getLogger(__name__)
 
 PROVIDERS = {
     "groq": {
@@ -80,6 +84,10 @@ def transcribe(
         if resp.status_code == 200:
             return strip_prompt_echo(resp.json().get("text", "").strip())
         last_error = f"{provider} STT failed ({resp.status_code}): {_error_message(resp)}"
+        log.warning(
+            "%s (model=%s, prompt=%s, audio=%d bytes)",
+            last_error, attempt_model, bool(attempt_prompt), len(wav_bytes),
+        )
         if resp.status_code != 400:
             break
     raise TranscriptionError(last_error)

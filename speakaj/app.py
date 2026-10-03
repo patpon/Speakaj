@@ -157,6 +157,10 @@ class SpeakajApp:
         self.overlay.quit()
 
     def run(self) -> None:
+        if not acquire_single_instance():
+            log.error("Another Speakaj is already running; exiting")
+            print(f"{APP_NAME} เปิดอยู่แล้ว (ดูไอคอนไมค์ข้างนาฬิกา)")
+            return
         self.hotkeys.start()
         self._start_tray()
         print(f"{APP_NAME} พร้อมแล้ว — กด [{self.cfg.hotkey}] ค้างไว้แล้วพูด, ปล่อยเพื่อพิมพ์ข้อความ")
@@ -167,6 +171,28 @@ class SpeakajApp:
             pass
         finally:
             self.quit()
+
+
+_instance_socket = None
+
+
+def acquire_single_instance(port: int = 47613) -> bool:
+    """Hold a localhost port so a second copy (e.g. run.bat clicked twice)
+    doesn't record and send every dictation a second time."""
+    global _instance_socket
+    import socket
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if sys.platform == "win32":
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+    try:
+        sock.bind(("127.0.0.1", port))
+        sock.listen(1)
+    except OSError:
+        sock.close()
+        return False
+    _instance_socket = sock
+    return True
 
 
 def _open_path(path) -> None:

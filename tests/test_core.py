@@ -169,3 +169,13 @@ def test_transcribe_error_message(monkeypatch):
 def test_prompt_echo_dropped():
     assert transcriber.strip_prompt_echo("สวัสดีครับ") == ""
     assert transcriber.strip_prompt_echo("ไปกินข้าว") == "ไปกินข้าว"
+
+
+def test_single_instance(unused_port=47999):
+    pytest.importorskip("tkinter")
+    from speakaj import app
+
+    assert app.acquire_single_instance(unused_port)
+    first = app._instance_socket
+    assert not app.acquire_single_instance(unused_port)
+    first.close()
