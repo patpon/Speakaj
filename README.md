@@ -39,6 +39,7 @@ git clone https://github.com/patpon/Speakaj.git
 cd Speakaj
 install.bat      :: สร้าง venv + ติดตั้ง + ตั้งค่า API key
 run.bat          :: เปิดโปรแกรม (ไม่มีหน้าต่างดำ)
+debug.bat        :: ถ้าเปิดแล้วไม่มีอะไรเกิดขึ้น ใช้ตัวนี้ดู error
 ```
 
 **macOS**
