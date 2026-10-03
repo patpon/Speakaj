@@ -142,6 +142,30 @@ def test_transcribe_request(monkeypatch):
     assert "language" not in sent["data"]
 
 
+def test_transcribe_retries_on_400(monkeypatch):
+    calls = []
+
+    def fake_post(url, headers, files, data, timeout):
+        calls.append(dict(data))
+        if len(calls) < 3:
+            return SimpleNamespace(
+                status_code=400, json=lambda: {"error": {"message": "bad"}}, text="bad"
+            )
+        return SimpleNamespace(status_code=200, json=lambda: {"text": "ok"}, text="")
+
+    monkeypatch.setattr(transcriber.requests, "post", fake_post)
+    assert transcriber.transcribe(b"x", provider="groq", api_key="k") == "ok"
+    assert "prompt" in calls[0] and "prompt" not in calls[1]
+    assert calls[2]["model"] == "whisper-large-v3-turbo"
+
+
+def test_transcribe_error_message(monkeypatch):
+    resp = SimpleNamespace(status_code=401, json=lambda: {"error": {"message": "Invalid API Key"}}, text="")
+    monkeypatch.setattr(transcriber.requests, "post", lambda *a, **k: resp)
+    with pytest.raises(transcriber.TranscriptionError, match="Invalid API Key"):
+        transcriber.transcribe(b"x", provider="groq", api_key="k")
+
+
 def test_prompt_echo_dropped():
     assert transcriber.strip_prompt_echo("สวัสดีครับ") == ""
     assert transcriber.strip_prompt_echo("ไปกินข้าว") == "ไปกินข้าว"

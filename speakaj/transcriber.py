@@ -8,10 +8,13 @@ PROVIDERS = {
     "groq": {
         "url": "https://api.groq.com/openai/v1/audio/transcriptions",
         "model": "whisper-large-v3",
+        # Tried in order if the main model is rejected (e.g. decommissioned).
+        "fallback_models": ["whisper-large-v3-turbo"],
     },
     "openai": {
         "url": "https://api.openai.com/v1/audio/transcriptions",
         "model": "gpt-4o-transcribe",
+        "fallback_models": ["whisper-1"],
     },
 }
 
@@ -50,30 +53,43 @@ def transcribe(
         )
 
     spec = PROVIDERS[provider]
-    data = {
-        "model": model or spec["model"],
-        "response_format": "json",
-        "temperature": "0",
-        "prompt": build_prompt(dictionary or []),
-    }
-    if language:
-        data["language"] = language
+    prompt = build_prompt(dictionary or [])
+    models = [model or spec["model"]] + [m for m in spec["fallback_models"] if m != model]
 
+    # On a 400 (bad request) retry without the prompt, then with fallback
+    # models, so a too-long prompt or a retired model doesn't break dictation.
+    attempts = [(models[0], prompt), (models[0], "")] + [(m, "") for m in models[1:]]
+    last_error = ""
+    for attempt_model, attempt_prompt in attempts:
+        data = {"model": attempt_model, "response_format": "json", "temperature": "0"}
+        if attempt_prompt:
+            data["prompt"] = attempt_prompt
+        if language:
+            data["language"] = language
+        try:
+            resp = requests.post(
+                spec["url"],
+                headers={"Authorization": f"Bearer {api_key}"},
+                files={"file": (filename, wav_bytes, "audio/wav")},
+                data=data,
+                timeout=timeout,
+            )
+        except requests.RequestException as exc:
+            raise TranscriptionError(f"Network error: {exc}") from exc
+
+        if resp.status_code == 200:
+            return strip_prompt_echo(resp.json().get("text", "").strip())
+        last_error = f"{provider} STT failed ({resp.status_code}): {_error_message(resp)}"
+        if resp.status_code != 400:
+            break
+    raise TranscriptionError(last_error)
+
+
+def _error_message(resp) -> str:
     try:
-        resp = requests.post(
-            spec["url"],
-            headers={"Authorization": f"Bearer {api_key}"},
-            files={"file": (filename, wav_bytes)},
-            data=data,
-            timeout=timeout,
-        )
-    except requests.RequestException as exc:
-        raise TranscriptionError(f"Network error: {exc}") from exc
-
-    if resp.status_code != 200:
-        raise TranscriptionError(f"{provider} STT failed ({resp.status_code}): {resp.text[:300]}")
-    text = resp.json().get("text", "")
-    return strip_prompt_echo(text.strip())
+        return str(resp.json()["error"]["message"])[:300]
+    except (ValueError, KeyError, TypeError):
+        return resp.text[:300]
 
 
 def strip_prompt_echo(text: str) -> str:

@@ -87,7 +87,7 @@ class SpeakajApp:
                 raw, text = process_audio(self.cfg, wav)
             except TranscriptionError as exc:
                 log.error("%s", exc)
-                self.overlay.show("error", str(exc)[:80])
+                self.overlay.show("error", str(exc)[:120])
                 sounds.play("error", self.cfg.play_sounds)
                 return
             if not text:
