@@ -111,8 +111,7 @@ Key จะถูกเก็บที่ `~/.speakaj/.env` (Windows: `C:\Users\<
 
 ## 🪟 Windows: เปิดอัตโนมัติตอนเปิดเครื่อง
 
-1. กด `Win + R` พิมพ์ `shell:startup` → Enter
-2. คลิกขวา `run.bat` (หรือ `Speakaj.exe`) → **Create shortcut** → ย้าย shortcut ไปโฟลเดอร์ที่เปิดขึ้นมา
+ดับเบิลคลิก **`autostart.bat`** ครั้งเดียว — เปิดเครื่องครั้งต่อไป Speakaj จะเปิดเอง (รันอีกครั้งเพื่อปิด)
 
 ถ้าจะใช้งานในโปรแกรมที่ Run as administrator ต้องเปิด Speakaj แบบ admin ด้วย
 
