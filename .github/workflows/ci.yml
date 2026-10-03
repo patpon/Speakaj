@@ -20,7 +20,7 @@ jobs:
       - name: System packages (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libportaudio2 xvfb
-      - run: pip install -r requirements.txt pytest
+      - run: pip install -r requirements.txt pytest pytest-github-actions-annotate-failures
       - name: Test (Linux, virtual display for pynput)
         if: runner.os == 'Linux'
         run: xvfb-run -a pytest -q
