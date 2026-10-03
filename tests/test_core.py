@@ -179,3 +179,12 @@ def test_single_instance(unused_port=47999):
     first = app._instance_socket
     assert not app.acquire_single_instance(unused_port)
     first.close()
+
+
+def test_setup_gui_env_roundtrip(tmp_path, monkeypatch):
+    pytest.importorskip("tkinter")
+    from speakaj import setup_gui
+
+    monkeypatch.setattr(setup_gui, "CONFIG_DIR", tmp_path)
+    setup_gui.write_env({"GROQ_API_KEY": "gsk_x", "ANTHROPIC_API_KEY": ""})
+    assert setup_gui.read_env() == {"GROQ_API_KEY": "gsk_x"}

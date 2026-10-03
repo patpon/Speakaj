@@ -108,8 +108,19 @@ def main(argv: list[str] | None = None) -> int:
 
     cfg = load_config()
     if not cfg.api_key(cfg.stt_provider):
-        print("ยังไม่ได้ตั้ง API key — เริ่มตั้งค่าครั้งแรก\n")
-        _setup()
+        if sys.stdin is None or not sys.stdin.isatty():
+            # Windowed build: no console to type into, so ask in a window.
+            from .setup_gui import run_setup_window
+
+            if not run_setup_window():
+                return 1
+            # Keys were written to ~/.speakaj/.env; load them into this process.
+            from .config import _load_dotenv
+
+            _load_dotenv(CONFIG_DIR / ".env")
+        else:
+            print("ยังไม่ได้ตั้ง API key — เริ่มตั้งค่าครั้งแรก\n")
+            _setup()
         cfg = load_config()
 
     from .app import SpeakajApp
