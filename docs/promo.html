@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speakaj</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@500;600;700&family=Anuphan:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one column that reads like a dictation session — key, voice, text — then proof, steps, download. */
+:root{
+  --paper:#F7F9FE; --surface:#FFFFFF; --ink:#0B1733; --muted:#55627D; --line:#DCE3F2;
+  --blue:#2350E6; --blue-soft:#E6ECFF; --rec:#E8432F; --ok:#15915A;
+  --key-top:#FFFFFF; --key-side:#C9D3EA;
+  --display:"Bai Jamjuree","Leelawadee UI",Tahoma,sans-serif;
+  --body:"Anuphan","Leelawadee UI",Tahoma,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0A1020; --surface:#111A30; --ink:#EAF0FF; --muted:#9AA8C7; --line:#223052;
+  --blue:#6E92FF; --blue-soft:#18244A; --rec:#FF6A55; --ok:#3CCB8A;
+  --key-top:#1A2645; --key-side:#0A1020; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0A1020; --surface:#111A30; --ink:#EAF0FF; --muted:#9AA8C7; --line:#223052;
+  --blue:#6E92FF; --blue-soft:#18244A; --rec:#FF6A55; --ok:#3CCB8A;
+  --key-top:#1A2645; --key-side:#0A1020; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:17px/1.7 var(--body);padding-inline:16px}
+.wrap{max-width:1040px;margin-inline:auto}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);line-height:1.15;text-wrap:balance;margin:0}
+p{margin:0}
+
+/* top bar */
+.bar{display:flex;justify-content:space-between;align-items:center;padding-block:20px}
+.brand{display:flex;align-items:center;gap:10px;font:700 20px var(--display);text-decoration:none}
+.brand svg{width:30px;height:30px}
+.bar a.gh{font:500 15px var(--body);color:var(--muted);text-decoration:none}
+.bar a.gh:hover{color:var(--blue)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding-block:40px 64px}
+.eyebrow{font:600 13px var(--mono);letter-spacing:.08em;color:var(--blue);text-transform:uppercase}
+.hero h1{font-size:clamp(46px,7.5vw,84px);font-weight:700;letter-spacing:-.01em;margin-block:14px 18px}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.lead{color:var(--muted);font-size:19px;max-width:30em}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border-radius:12px;font:600 16px var(--body);text-decoration:none;border:1.5px solid var(--line);background:var(--surface);transition:transform .15s,border-color .15s}
+.btn:hover{transform:translateY(-2px);border-color:var(--blue)}
+.btn:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn small{font:500 12px var(--mono);opacity:.8}
+.note{margin-top:14px;font-size:14px;color:var(--muted)}
+
+/* demo */
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 30px 60px -30px rgba(35,80,230,.35);min-width:0}
+.demo-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.app{font:500 13px var(--mono);color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--paper);border-radius:999px;padding:7px 14px;font:500 14px var(--body)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok)}
+.pill[data-s="rec"] .dot{background:var(--rec);animation:pulse 1s infinite}
+.pill[data-s="proc"] .dot{background:var(--blue)}
+.bars{display:flex;gap:3px;align-items:center;height:16px}
+.bars i{width:3px;height:4px;border-radius:2px;background:var(--rec);opacity:0}
+.pill[data-s="rec"] .bars i{opacity:1;animation:wave .9s infinite ease-in-out}
+.bars i:nth-child(2){animation-delay:.12s}.bars i:nth-child(3){animation-delay:.24s}.bars i:nth-child(4){animation-delay:.36s}.bars i:nth-child(5){animation-delay:.48s}
+@keyframes wave{50%{height:16px}}
+@keyframes pulse{50%{opacity:.35}}
+.said{margin-top:22px;font-size:15px;color:var(--muted)}
+.said .lbl,.typed .lbl{display:block;font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px}
+.said .f{color:var(--rec);text-decoration:line-through;text-decoration-thickness:2px}
+.typed{margin-top:18px;padding:16px 18px;border-radius:14px;background:var(--blue-soft);font-size:18px;min-height:96px}
+.typed .lbl{color:var(--blue)}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--blue);vertical-align:-.15em;margin-left:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.keyrow{display:flex;align-items:center;gap:16px;margin-top:22px;flex-wrap:wrap}
+.key{font:700 15px var(--mono);color:var(--ink);background:var(--key-top);border:1.5px solid var(--line);border-bottom-width:6px;border-bottom-color:var(--key-side);border-radius:12px;padding:12px 22px;cursor:pointer;user-select:none;transition:transform .08s,border-bottom-width .08s}
+.key:active,.key.down{transform:translateY(4px);border-bottom-width:2px}
+.key:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.keyhint{font-size:14px;color:var(--muted)}
+
+/* stats */
+.facts{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line)}
+.fact{padding:26px 18px;border-left:1px solid var(--line)}
+.fact:first-child{border-left:0}
+.fact b{display:block;font:700 30px var(--display);color:var(--blue);font-variant-numeric:tabular-nums}
+.fact span{font-size:14px;color:var(--muted)}
+
+section{padding-block:76px}
+.sec-head{max-width:36em;margin-bottom:36px}
+.sec-head h2{font-size:clamp(30px,4.5vw,44px);font-weight:700}
+.sec-head p{color:var(--muted);margin-top:10px}
+
+/* steps — a real sequence */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:s}
+.step{counter-increment:s;min-width:0}
+.step::before{content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:2px solid var(--blue);color:var(--blue);font:700 18px var(--display);margin-bottom:14px}
+.step h3{font-size:22px;margin-bottom:6px}
+.step p{color:var(--muted)}
+kbd{font:700 13px var(--mono);border:1px solid var(--line);border-bottom-width:3px;border-radius:6px;padding:1px 7px;background:var(--key-top)}
+
+/* use cases */
+.uses{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.use{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;min-width:0}
+.use .where{font:600 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--blue)}
+.use q{display:block;margin-top:8px;font-size:17px;quotes:"“" "”"}
+.apps{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.apps span{border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:14px;color:var(--muted)}
+
+/* features */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:34px 28px}
+.feat{min-width:0}
+.feat h3{font-size:20px;margin-bottom:6px}
+.feat p{color:var(--muted);font-size:16px}
+
+/* download */
+.dl{background:var(--ink);color:var(--paper);border-radius:28px;padding:56px clamp(22px,5vw,64px);display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.dl h2{font-size:clamp(32px,5vw,52px)}
+.dl p{opacity:.75;margin-top:12px}
+.dl .btn{background:transparent;color:var(--paper);border-color:color-mix(in srgb,var(--paper) 35%,transparent)}
+.dl .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
+.dl ol{margin:0;padding-left:1.2em;display:grid;gap:10px;font-size:16px}
+.dl ol li::marker{font:700 15px var(--mono);color:var(--blue)}
+.dl code{font:500 14px var(--mono);background:color-mix(in srgb,var(--paper) 12%,transparent);padding:1px 6px;border-radius:5px}
+
+/* faq */
+.faq{display:grid;gap:10px;max-width:760px}
+details{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px 20px}
+summary{cursor:pointer;font:600 18px var(--display);list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::after{content:"+";color:var(--blue);font-family:var(--mono)}
+details[open] summary::after{content:"−"}
+details p{color:var(--muted);margin-top:10px;font-size:16px}
+
+footer{border-top:1px solid var(--line);padding-block:30px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+@media (max-width:860px){
+  .hero,.dl{grid-template-columns:1fr}
+  .facts{grid-template-columns:repeat(2,1fr)}
+  .fact:nth-child(3){border-left:0}
+  .fact:nth-child(n+3){border-top:1px solid var(--line)}
+  .steps,.feats{grid-template-columns:1fr}
+  .uses{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="bar">
+    <a class="brand" href="#top" aria-label="Speakaj">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="var(--blue)"/><rect x="12" y="6" width="8" height="13" rx="4" fill="#fff"/><path d="M9 15a7 7 0 0 0 14 0" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M16 22v4" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Speakaj
+    </a>
+    <a class="gh" href="https://github.com/patpon/Speakaj">GitHub ↗</a>
+  </header>
+
+  <main id="top">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">ภาษาไทย + English · Windows &amp; Mac</div>
+        <h1>แค่พูด<br><em>ไม่ต้องพิมพ์</em></h1>
+        <p class="lead">กด <kbd>Ctrl ขวา</kbd> ค้างไว้ พูดตามปกติ แล้วปล่อย ข้อความที่เรียบเรียงแล้วจะพิมพ์ลงช่องที่เคอร์เซอร์อยู่ ใช้ได้กับ LINE, Excel, Gmail และทุกโปรแกรม</p>
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-windows.zip">ดาวน์โหลดสำหรับ Windows <small>40 MB</small></a>
+          <a class="btn" href="https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-macos.zip">สำหรับ Mac <small>30 MB</small></a>
+        </div>
+        <p class="note">ฟรี · ไม่ต้องสมัครสมาชิก · ใช้ Groq API key ฟรีของคุณเอง</p>
+      </div>
+
+      <div class="demo" aria-label="ตัวอย่างการทำงาน">
+        <div class="demo-top">
+          <span class="app">LINE · กลุ่มผู้จัดการสาขา</span>
+          <span class="pill" id="pill" data-s="done"><span class="dot"></span><span class="bars"><i></i><i></i><i></i><i></i><i></i></span><span id="pillText">✓ 14 คำ · 1.4 วิ</span></span>
+        </div>
+        <p class="said"><span class="lbl">สิ่งที่พูด</span><span id="said"><span class="f">เอ่อ</span> พรุ่งนี้ <span class="f">อืม</span> ประชุมสาขา ตอนบ่ายสองนะครับ <span class="f">แล้วก็ แล้วก็</span> ฝากส่ง report ยอดขาย มาก่อนเที่ยง</span></p>
+        <div class="typed"><span class="lbl">สิ่งที่พิมพ์ให้</span><span id="typed">พรุ่งนี้ประชุมสาขาตอนบ่ายสองนะครับ ฝากส่ง report ยอดขายมาก่อนเที่ยง</span><span class="caret"></span></div>
+        <div class="keyrow">
+          <button class="key" id="key" type="button">Ctrl ขวา</button>
+          <span class="keyhint">กดปุ่มนี้ (หรือ Ctrl ขวาบนคีย์บอร์ด) เพื่อดูอีกครั้ง</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="facts">
+      <div class="fact"><b>1–2 วิ</b><span>ปล่อยปุ่มแล้วข้อความขึ้น</span></div>
+      <div class="fact"><b>ไทย+EN</b><span>พูดปนกันในประโยคเดียวได้</span></div>
+      <div class="fact"><b>2,000</b><span>ครั้งต่อวัน ฟรีด้วย Groq</span></div>
+      <div class="fact"><b>0 บาท</b><span>ไม่มีค่าสมาชิกรายเดือน</span></div>
+    </div>
+
+    <section>
+      <div class="sec-head">
+        <h2>ใช้ง่าย สามจังหวะ</h2>
+        <p>ไม่ต้องเปิดหน้าต่างใหม่ ไม่ต้องสลับโปรแกรม ทำงานอยู่ตรงไหนก็พูดได้ตรงนั้น</p>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>กดค้าง</h3><p>กด <kbd>Ctrl ขวา</kbd> ค้างไว้ จะมีแถบเล็กขึ้นว่า “กำลังฟัง…” หรือกด <kbd>F9</kbd> ครั้งเดียวเมื่ออยากพูดยาวๆ</p></div>
+        <div class="step"><h3>พูดตามธรรมชาติ</h3><p>ไม่ต้องพูดช้า ไม่ต้องบอกวรรคตอน พูดไทยปนคำอังกฤษอย่าง report, meeting ได้ตามปกติ</p></div>
+        <div class="step"><h3>ปล่อยปุ่ม</h3><p>คำว่า เอ่อ อืม คำพูดซ้ำ ถูกตัดออก แล้วข้อความพิมพ์ลงช่องให้ทันที</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head">
+        <h2>งานที่เคยพิมพ์ทั้งวัน พูดแทนได้เลย</h2>
+        <p>เหมาะกับคนที่ตอบแชต เขียนอีเมล หรือจดงานเยอะ แต่ไม่อยากนั่งจิ้มคีย์บอร์ด</p>
+      </div>
+      <div class="uses">
+        <div class="use"><span class="where">LINE ตอบลูกค้า</span><q>รับทราบครับ ของจะส่งถึงร้านพรุ่งนี้ช่วงเช้า ถ้ามีปัญหาโทรหาผมได้เลยครับ</q></div>
+        <div class="use"><span class="where">Gmail / Outlook</span><q>เรียนทุกสาขา ขอให้ส่งยอดขายประจำสัปดาห์ภายในวันศุกร์นี้ ขอบคุณครับ</q></div>
+        <div class="use"><span class="where">Excel หมายเหตุ</span><q>สาขาขอนแก่น สต็อกขนมปังแซนด์วิชเหลือน้อย ต้องเติมก่อนวันจันทร์</q></div>
+        <div class="use"><span class="where">ChatGPT / Claude</span><q>ช่วยสรุปรายงานนี้เป็นข้อๆ สั้นๆ ให้หัวหน้าอ่านได้ในหนึ่งนาที</q></div>
+      </div>
+      <div class="apps" aria-label="โปรแกรมที่ใช้ได้">
+        <span>LINE</span><span>Word</span><span>Excel</span><span>Google Sheets</span><span>Gmail</span><span>Outlook</span><span>Facebook</span><span>ChatGPT</span><span>Claude</span><span>Notion</span><span>Notepad</span><span>ทุกช่องที่พิมพ์ได้</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="sec-head"><h2>ทำไมต้อง Speakaj</h2></div>
+      <div class="feats">
+        <div class="feat"><h3>ฟังภาษาไทยเข้าใจ</h3><p>ใช้ Whisper large-v3 แยกไทยกับอังกฤษให้เอง เพิ่มคำเฉพาะ เช่น ชื่อสินค้าหรือชื่อสาขา ให้ฟังแม่นขึ้นได้</p></div>
+        <div class="feat"><h3>เกลาคำให้อัตโนมัติ</h3><p>ตัดคำว่า เอ่อ อืม และคำซ้ำ ใส่ Claude API key เพิ่มได้ ถ้าอยากให้เรียบเรียงและใส่วรรคตอนละเอียดขึ้น</p></div>
+        <div class="feat"><h3>ใช้ได้กับแป้นภาษาไทย</h3><p>ไม่ต้องสลับภาษาแป้นพิมพ์ก่อนพูด เปิดแป้นไทยค้างไว้ก็พิมพ์ได้ปกติ</p></div>
+        <div class="feat"><h3>เปิดพร้อมเครื่อง</h3><p>ตั้งให้เปิดเองตอนเปิดคอม แล้วอยู่เงียบๆ เป็นไอคอนไมค์ข้างนาฬิกา</p></div>
+        <div class="feat"><h3>ข้อมูลอยู่ในเครื่องคุณ</h3><p>API key และประวัติเก็บในเครื่อง ไม่มีเซิร์ฟเวอร์กลาง ไม่ต้องสมัครบัญชีกับเรา</p></div>
+        <div class="feat"><h3>โค้ดเปิดให้ดู</h3><p>Open source สัญญาอนุญาต MIT ตรวจสอบได้ทุกบรรทัดบน GitHub</p></div>
+      </div>
+    </section>
+
+    <div class="dl" id="download">
+      <div>
+        <h2>เริ่มพูดแทนพิมพ์ได้ภายใน 5 นาที</h2>
+        <p>เวอร์ชัน 0.1.0 · Windows 10/11 และ macOS</p>
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-windows.zip">ดาวน์โหลด Windows</a>
+          <a class="btn" href="https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-macos.zip">ดาวน์โหลด Mac</a>
+        </div>
+      </div>
+      <ol>
+        <li>แตกไฟล์ zip แล้วดับเบิลคลิก <code>Speakaj.exe</code></li>
+        <li>ถ้า Windows เตือน ให้กด More info → Run anyway</li>
+        <li>ขอ Groq API key ฟรีที่ <code>console.groq.com/keys</code> แล้ววางในหน้าต่างตั้งค่า</li>
+        <li>คลิกช่องที่จะพิมพ์ กด Ctrl ขวาค้าง แล้วพูดได้เลย</li>
+      </ol>
+    </div>
+
+    <section>
+      <div class="sec-head"><h2>คำถามที่พบบ่อย</h2></div>
+      <div class="faq">
+        <details open><summary>ใช้ฟรีจริงไหม</summary><p>ตัวโปรแกรมฟรี การแปลงเสียงใช้ Groq แบบฟรี ไม่ต้องใส่บัตรเครดิต ได้ประมาณ 2,000 ครั้งต่อวัน ถ้าใส่ Claude API key เพื่อเกลาข้อความ ส่วนนั้นจ่ายตามที่ใช้จริง</p></details>
+        <details><summary>ต้องต่ออินเทอร์เน็ตไหม</summary><p>ต้องต่อ เพราะเสียงถูกส่งไปแปลงเป็นข้อความที่ Groq แล้วส่งกลับมา ใช้เวลาประมาณ 1–2 วินาที</p></details>
+        <details><summary>เสียงของฉันถูกเก็บไว้ที่ไหน</summary><p>Speakaj ไม่มีเซิร์ฟเวอร์ของตัวเอง เสียงส่งตรงไปที่ Groq ด้วย key ของคุณ ข้อความที่ได้เก็บเป็นประวัติในเครื่องคุณเท่านั้น</p></details>
+        <details><summary>ใช้กับโปรแกรมไหนได้บ้าง</summary><p>ทุกโปรแกรมที่มีช่องให้พิมพ์ เพราะ Speakaj วางข้อความเหมือนเรากด Ctrl+V เอง</p></details>
+        <details><summary>ใครเป็นคนทำ</summary><p>พัฒนาโดยคนไทย เพื่อคนทำงานที่อยากพิมพ์ภาษาไทยให้เร็วขึ้น โค้ดอยู่ที่ github.com/patpon/Speakaj</p></details>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Speakaj 0.1.0 · Open source (MIT)</span>
+    <a href="https://github.com/patpon/Speakaj">github.com/patpon/Speakaj</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var pill=document.getElementById('pill'), pillText=document.getElementById('pillText');
+  var said=document.getElementById('said'), typed=document.getElementById('typed'), key=document.getElementById('key');
+  var SAID=said.innerHTML, FINAL=typed.textContent, timers=[], running=false;
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function later(fn,ms){timers.push(setTimeout(fn,ms))}
+  function play(){
+    if(running) return; running=true;
+    timers.forEach(clearTimeout); timers=[];
+    key.classList.add('down');
+    pill.dataset.s='rec'; pillText.textContent='กำลังฟัง…';
+    typed.textContent=''; said.textContent='';
+    var words=SAID.replace(/<span class="f">/g,'\u0001').replace(/<\/span>/g,'\u0002').split(' ');
+    // reveal the spoken words one by one, fillers in plain form until processing
+    var html='', i=0;
+    (function next(){
+      if(i<words.length){
+        html+=(i?' ':'')+words[i].replace(/\u0001|\u0002/g,'');
+        said.textContent=html; i++; later(next,reduce?0:150);
+      } else {
+        key.classList.remove('down');
+        pill.dataset.s='proc'; pillText.textContent='กำลังแปลงเสียง…';
+        later(function(){
+          said.innerHTML=SAID;
+          pill.dataset.s='done'; pillText.textContent='✓ 14 คำ · 1.4 วิ';
+          var j=0;(function type(){
+            if(j<=FINAL.length){typed.textContent=FINAL.slice(0,j);j+=2;later(type,reduce?0:22)}
+            else{running=false}
+          })();
+        },reduce?0:900);
+      }
+    })();
+  }
+  key.addEventListener('click',play);
+  document.addEventListener('keydown',function(e){if(e.code==='ControlRight'&&!e.repeat)play()});
+})();
+</script>
+</body>
+</html>
