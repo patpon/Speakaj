@@ -20,6 +20,12 @@ PROVIDERS = {
         "model": "gpt-4o-transcribe",
         "fallback_models": ["whisper-1"],
     },
+    # Demo relay: a Groq proxy that checks a demo code instead of a key.
+    "relay": {
+        "url": "{relay_url}/v1/transcribe",
+        "model": "whisper-large-v3",
+        "fallback_models": ["whisper-large-v3-turbo"],
+    },
 }
 
 # A short bilingual prompt nudges Whisper to keep Thai in Thai script and
@@ -47,16 +53,26 @@ def transcribe(
     dictionary: list[str] | None = None,
     filename: str = "speech.wav",
     timeout: float = 60.0,
+    relay_url: str = "",
 ) -> str:
     if provider not in PROVIDERS:
         raise TranscriptionError(f"Unknown STT provider: {provider!r}")
     if not api_key:
+        if provider == "relay":
+            raise TranscriptionError("ยังไม่ได้ใส่รหัสทดลอง (เปิดเมนู ตั้งค่า)")
         raise TranscriptionError(
             f"Missing API key for {provider}. Set {provider.upper()}_API_KEY "
             "in your environment or ~/.speakaj/.env"
         )
 
     spec = PROVIDERS[provider]
+    url = spec["url"]
+    headers = {"Authorization": f"Bearer {api_key}"}
+    if provider == "relay":
+        if not relay_url:
+            raise TranscriptionError("ยังไม่ได้ตั้งค่า relay_url ของรหัสทดลอง")
+        url = url.format(relay_url=relay_url.rstrip("/"))
+        headers = {"X-Speakaj-Code": api_key}
     prompt = build_prompt(dictionary or [])
     models = [model or spec["model"]] + [m for m in spec["fallback_models"] if m != model]
 
@@ -72,8 +88,8 @@ def transcribe(
             data["language"] = language
         try:
             resp = requests.post(
-                spec["url"],
-                headers={"Authorization": f"Bearer {api_key}"},
+                url,
+                headers=headers,
                 files={"file": (filename, wav_bytes, "audio/wav")},
                 data=data,
                 timeout=timeout,
@@ -84,6 +100,10 @@ def transcribe(
         if resp.status_code == 200:
             return strip_prompt_echo(resp.json().get("text", "").strip())
         last_error = f"{provider} STT failed ({resp.status_code}): {_error_message(resp)}"
+        if provider == "relay" and resp.status_code in (401, 403, 429):
+            # Demo-code problems (wrong, expired, daily limit) are already
+            # written for the user by the relay.
+            last_error = _error_message(resp)
         log.warning(
             "%s (model=%s, prompt=%s, audio=%d bytes)",
             last_error, attempt_model, bool(attempt_prompt), len(wav_bytes),

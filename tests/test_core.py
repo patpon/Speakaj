@@ -188,3 +188,32 @@ def test_setup_gui_env_roundtrip(tmp_path, monkeypatch):
     monkeypatch.setattr(setup_gui, "CONFIG_DIR", tmp_path)
     setup_gui.write_env({"GROQ_API_KEY": "gsk_x", "ANTHROPIC_API_KEY": ""})
     assert setup_gui.read_env() == {"GROQ_API_KEY": "gsk_x"}
+
+
+def test_transcribe_via_relay(monkeypatch):
+    sent = {}
+
+    def fake_post(url, headers, files, data, timeout):
+        sent.update(url=url, headers=headers)
+        return SimpleNamespace(status_code=200, json=lambda: {"text": "ok"}, text="")
+
+    monkeypatch.setattr(transcriber.requests, "post", fake_post)
+    out = transcriber.transcribe(b"x", provider="relay", api_key="DEMO-AAAA-BBBB", relay_url="https://r.dev/")
+    assert out == "ok"
+    assert sent["url"] == "https://r.dev/v1/transcribe"
+    assert sent["headers"] == {"X-Speakaj-Code": "DEMO-AAAA-BBBB"}
+
+
+def test_relay_demo_errors_shown_as_is(monkeypatch):
+    resp = SimpleNamespace(status_code=403, json=lambda: {"error": {"message": "หมดระยะทดลองใช้แล้ว"}}, text="")
+    monkeypatch.setattr(transcriber.requests, "post", lambda *a, **k: resp)
+    with pytest.raises(transcriber.TranscriptionError) as exc:
+        transcriber.transcribe(b"x", provider="relay", api_key="DEMO-AAAA-BBBB", relay_url="https://r.dev")
+    assert str(exc.value) == "หมดระยะทดลองใช้แล้ว"
+
+
+def test_config_relay_key(monkeypatch):
+    monkeypatch.delenv("SPEAKAJ_DEMO_CODE", raising=False)
+    cfg = Config(demo_code="DEMO-AAAA-BBBB", relay_url="https://r.dev/")
+    assert cfg.api_key("relay") == "DEMO-AAAA-BBBB"
+    assert cfg.effective_relay_url() == "https://r.dev"

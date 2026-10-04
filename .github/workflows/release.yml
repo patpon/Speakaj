@@ -28,6 +28,20 @@ jobs:
       - name: Zip (Windows)
         if: runner.os == 'Windows'
         run: Compress-Archive -Path dist/Speakaj.exe, README.md, .env.example -DestinationPath ${{ matrix.asset }}
+      - name: Installer (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (!(Test-Path $iscc)) { choco install innosetup -y --no-progress }
+          $ver = "${{ github.event.release.tag_name || github.ref_name }}".TrimStart("v")
+          if ($ver -notmatch '^\d') { $ver = "0.0.0" }
+          & $iscc "/DAppVersion=$ver" installer\speakaj.iss
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: Speakaj-Setup.exe
+          path: dist/Speakaj-Setup.exe
       - name: Zip (macOS)
         if: runner.os == 'macOS'
         run: cd dist && ditto -c -k --keepParent Speakaj.app ../${{ matrix.asset }}
@@ -40,5 +54,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name || github.ref_name }}
-          files: ${{ matrix.asset }}
+          files: |
+            ${{ matrix.asset }}
+            dist/Speakaj-Setup.exe
+          fail_on_unmatched_files: false
           generate_release_notes: true

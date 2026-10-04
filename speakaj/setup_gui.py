@@ -37,8 +37,10 @@ def write_env(values: dict[str, str]) -> None:
 
 
 def run_setup_window() -> bool:
-    """Show the setup window. Returns True if a speech-to-text key was saved."""
+    """Show the setup window. Returns True if a way to transcribe was saved."""
     values = read_env()
+    cfg = load_config()
+    has_relay = bool(cfg.effective_relay_url())
     saved = {"ok": False}
 
     root = tk.Tk()
@@ -49,9 +51,18 @@ def run_setup_window() -> bool:
     tk.Label(root, text="แค่พูด ไม่ต้องพิมพ์", font=(FONT, 16, "bold"), bg="white", fg=BLUE).pack(anchor="w")
     tk.Label(
         root,
-        text="ใส่ Groq API key เพื่อแปลงเสียงเป็นข้อความ (ขอฟรี กดลิงก์ด้านล่าง)",
+        text="ใส่รหัสทดลอง หรือ Groq API key ของคุณเอง อย่างใดอย่างหนึ่ง" if has_relay
+        else "ใส่ Groq API key เพื่อแปลงเสียงเป็นข้อความ (ขอฟรี กดลิงก์ด้านล่าง)",
         font=(FONT, 10), bg="white", fg="#475569",
     ).pack(anchor="w", pady=(2, 14))
+
+    demo = None
+    if has_relay:
+        tk.Label(root, text="รหัสทดลอง (เช่น DEMO-AB12-CD34)", font=(FONT, 10, "bold"), bg="white").pack(anchor="w")
+        demo = tk.Entry(root, width=52, font=("Consolas", 12))
+        demo.insert(0, cfg.demo_code)
+        demo.pack(anchor="w", ipady=4, pady=(0, 6))
+        tk.Label(root, text="— หรือ —", font=(FONT, 9), bg="white", fg="#94A3B8").pack(pady=(4, 8))
 
     entries = {}
     for key, label, url in KEYS:
@@ -72,12 +83,17 @@ def run_setup_window() -> bool:
     def save():
         for key, entry in entries.items():
             values[key] = entry.get().strip()
-        if not values.get("GROQ_API_KEY"):
-            messagebox.showwarning(APP_NAME, "กรุณาใส่ Groq API key", parent=root)
+        code = demo.get().strip().upper() if demo is not None else ""
+        if not code and not values.get("GROQ_API_KEY"):
+            messagebox.showwarning(
+                APP_NAME, "กรุณาใส่รหัสทดลอง หรือ Groq API key" if has_relay else "กรุณาใส่ Groq API key", parent=root
+            )
             return
         write_env(values)
         cfg = load_config()
-        cfg.stt_provider = "groq"
+        # A personal Groq key wins over a demo code when both are filled in.
+        cfg.stt_provider = "groq" if values.get("GROQ_API_KEY") else "relay"
+        cfg.demo_code = code
         cfg.save()
         saved["ok"] = True
         root.destroy()
@@ -90,6 +106,6 @@ def run_setup_window() -> bool:
 
     root.bind("<Return>", lambda _e: save())
     root.eval("tk::PlaceWindow . center")
-    entries["GROQ_API_KEY"].focus_set()
+    (demo or entries["GROQ_API_KEY"]).focus_set()
     root.mainloop()
     return saved["ok"]

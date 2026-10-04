@@ -32,6 +32,7 @@ def process_audio(cfg: Config, audio: bytes, filename: str = "speech.wav") -> tu
         model=cfg.stt_model,
         language=cfg.language,
         dictionary=cfg.dictionary,
+        relay_url=cfg.effective_relay_url(),
     )
     return raw, clean(raw, cfg)
 

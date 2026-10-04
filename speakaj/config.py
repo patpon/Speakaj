@@ -14,6 +14,11 @@ from pathlib import Path
 CONFIG_DIR = Path(os.environ.get("SPEAKAJ_HOME", Path.home() / ".speakaj"))
 CONFIG_FILE = CONFIG_DIR / "config.json"
 
+# Demo relay that holds the Groq key for people trying Speakaj with a demo
+# code (see relay/README.md). Set after deploying the relay; config.json's
+# relay_url overrides it.
+DEFAULT_RELAY_URL = ""
+
 
 @dataclass
 class Config:
@@ -23,7 +28,8 @@ class Config:
     # Optional hands-free toggle key: press once to start, again to stop.
     toggle_hotkey: str = "f9"
 
-    # Speech-to-text provider: "groq" (fast, free tier) or "openai".
+    # Speech-to-text provider: "groq" (fast, free tier), "openai", or "relay"
+    # (demo code; the relay holds the Groq key).
     stt_provider: str = "groq"
     stt_model: str = ""  # empty = provider default
     # Language hint for Whisper. "" lets Whisper auto-detect, which handles
@@ -58,6 +64,8 @@ class Config:
     groq_api_key: str = ""
     openai_api_key: str = ""
     anthropic_api_key: str = ""
+    demo_code: str = ""
+    relay_url: str = ""
 
     dictionary: list[str] = field(default_factory=list)
 
@@ -66,8 +74,14 @@ class Config:
             "groq": "GROQ_API_KEY",
             "openai": "OPENAI_API_KEY",
             "anthropic": "ANTHROPIC_API_KEY",
+            "relay": "SPEAKAJ_DEMO_CODE",
         }[provider]
+        if provider == "relay":
+            return os.environ.get(env) or self.demo_code
         return os.environ.get(env) or getattr(self, f"{provider}_api_key", "")
+
+    def effective_relay_url(self) -> str:
+        return (self.relay_url or DEFAULT_RELAY_URL).rstrip("/")
 
     def save(self, path: Path = CONFIG_FILE) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
