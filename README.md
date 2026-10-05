@@ -78,7 +78,7 @@ Key จะถูกเก็บที่ `~/.speakaj/.env` (Windows: `C:\Users\<
 
 | Field | Default | ความหมาย |
 |---|---|---|
-| `hotkey` | `"ctrl_r"` | ปุ่มกดค้างเพื่อพูด (`alt_r`, `f8`, `cmd_r` …) |
+| `hotkey` | `"ctrl_r,pause"` | ปุ่มกดค้างเพื่อพูด ใส่ได้หลายปุ่มคั่นด้วย , (`pause`, `scroll_lock`, `f8`, `alt_r` …) |
 | `toggle_hotkey` | `"f9"` | ปุ่มเปิด/ปิดอัดแบบไม่ต้องกดค้าง (`""` = ปิด) |
 | `stt_provider` | `"groq"` | `groq` หรือ `openai` |
 | `language` | `""` | `""` = ตรวจภาษาอัตโนมัติ, `"th"`, `"en"` |

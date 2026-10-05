@@ -9,6 +9,25 @@ from typing import Callable
 # typing a shortcut (e.g. Ctrl+C), not dictating, so the recording is cancelled.
 SHORTCUT_GRACE_SECONDS = 0.4
 
+# Hold-to-talk keys offered in the setup window, with the names people see.
+# Several can be active at once ("ctrl_r,pause"), for keyboards that lack one.
+HOLD_KEY_CHOICES = [
+    ("ctrl_r", "Ctrl ขวา"),
+    ("pause", "Pause"),
+    ("scroll_lock", "Scroll Lock"),
+    ("f8", "F8"),
+]
+KEY_LABELS = dict(HOLD_KEY_CHOICES) | {"alt_r": "Alt ขวา", "f9": "F9", "cmd_r": "Cmd ขวา"}
+
+
+def split_keys(names: str) -> list[str]:
+    return [n.strip().lower() for n in names.split(",") if n.strip()]
+
+
+def describe_keys(names: str) -> str:
+    """'ctrl_r,pause' -> 'Ctrl ขวา / Pause' for menus and hints."""
+    return " / ".join(KEY_LABELS.get(n, n.upper() if len(n) > 1 else n) for n in split_keys(names))
+
 
 def parse_key(name: str):
     from pynput.keyboard import Key, KeyCode
@@ -32,7 +51,7 @@ class HotkeyListener:
         on_stop: Callable[[], None],
         on_cancel: Callable[[], None],
     ):
-        self.hold_key = parse_key(hold_key)
+        self.hold_keys = [k for k in (parse_key(n) for n in split_keys(hold_key)) if k is not None]
         self.toggle_key = parse_key(toggle_key)
         self.on_start = on_start
         self.on_stop = on_stop
@@ -49,7 +68,7 @@ class HotkeyListener:
         return getattr(key, "char", None) is not None and getattr(target, "char", None) == key.char
 
     def _on_press(self, key):
-        if self._matches(key, self.hold_key):
+        if any(self._matches(key, k) for k in self.hold_keys):
             if self._mode is None:  # ignore key auto-repeat
                 self._mode = "hold"
                 self._pressed_at = time.monotonic()
@@ -68,7 +87,7 @@ class HotkeyListener:
             self.on_cancel()
 
     def _on_release(self, key):
-        if self._mode == "hold" and self._matches(key, self.hold_key):
+        if self._mode == "hold" and any(self._matches(key, k) for k in self.hold_keys):
             self._mode = None
             self.on_stop()
 

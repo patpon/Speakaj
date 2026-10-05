@@ -217,3 +217,10 @@ def test_config_relay_key(monkeypatch):
     cfg = Config(demo_code="DEMO-AAAA-BBBB", relay_url="https://r.dev/")
     assert cfg.api_key("relay") == "DEMO-AAAA-BBBB"
     assert cfg.effective_relay_url() == "https://r.dev"
+
+
+def test_describe_keys():
+    from speakaj.hotkey import describe_keys
+
+    assert describe_keys("ctrl_r,pause") == "Ctrl ขวา / Pause"
+    assert describe_keys("scroll_lock") == "Scroll Lock"

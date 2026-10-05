@@ -12,7 +12,7 @@ import time
 from . import APP_NAME, __version__, sounds
 from .cleaner import clean
 from .config import CONFIG_DIR, CONFIG_FILE, Config
-from .hotkey import HotkeyListener
+from .hotkey import HotkeyListener, describe_keys
 from .inserter import copy_to_clipboard, insert_text
 from .overlay import Overlay
 from .recorder import Recorder, is_silent, to_wav_bytes
@@ -142,7 +142,7 @@ class SpeakajApp:
 
         item = pystray.MenuItem
         menu = pystray.Menu(
-            item(f"{APP_NAME} {__version__} · กด {self.cfg.hotkey} ค้างเพื่อพูด", None, enabled=False),
+            item(f"{APP_NAME} {__version__} · กด {describe_keys(self.cfg.hotkey)} ค้างเพื่อพูด", None, enabled=False),
             item(lambda _: self._usage_text(), None, enabled=False),
             pystray.Menu.SEPARATOR,
             item("คัดลอกข้อความล่าสุด", lambda: copy_to_clipboard(last_history())),
@@ -174,7 +174,7 @@ class SpeakajApp:
             return
         self.hotkeys.start()
         self._start_tray()
-        print(f"{APP_NAME} พร้อมแล้ว — กด [{self.cfg.hotkey}] ค้างไว้แล้วพูด, ปล่อยเพื่อพิมพ์ข้อความ")
+        print(f"{APP_NAME} พร้อมแล้ว — กด [{describe_keys(self.cfg.hotkey)}] ค้างไว้แล้วพูด, ปล่อยเพื่อพิมพ์ข้อความ")
         print(f"หรือกด [{self.cfg.toggle_hotkey}] เพื่อเริ่ม/หยุดแบบไม่ต้องกดค้าง · Ctrl+C เพื่อออก")
         try:
             self.overlay.run()

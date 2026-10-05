@@ -9,6 +9,7 @@ from tkinter import messagebox
 
 from . import APP_NAME
 from .config import CONFIG_DIR, load_config
+from .hotkey import HOLD_KEY_CHOICES, split_keys
 from .overlay import FONT
 
 BLUE = "#2563EB"
@@ -79,8 +80,24 @@ def run_setup_window() -> bool:
         link.pack(anchor="w", pady=(2, 12))
         entries[key] = entry
 
+    # Hold-to-talk keys: any ticked key works, so keyboards without a right
+    # Ctrl (many compact and wireless ones) can still push-to-talk.
+    keys_box = tk.Frame(root, bg="white")
+    tk.Label(keys_box, text="ปุ่มกดค้างเพื่อพูด (เลือกได้หลายปุ่ม)", font=(FONT, 10, "bold"), bg="white").pack(anchor="w")
+    row = tk.Frame(keys_box, bg="white")
+    row.pack(anchor="w", pady=(2, 0))
+    current = set(split_keys(cfg.hotkey))
+    key_vars = {}
+    for name, label in HOLD_KEY_CHOICES:
+        var = tk.BooleanVar(value=name in current)
+        tk.Checkbutton(row, text=label, variable=var, font=(FONT, 10), bg="white",
+                       activebackground="white", highlightthickness=0).pack(side="left", padx=(0, 14))
+        key_vars[name] = var
+    tk.Label(keys_box, text="F9 = กดครั้งเดียวเริ่มพูด กดอีกครั้งหยุด (ใช้ได้เสมอ) · F8 ชนกับ Excel · Scroll Lock จะสลับไฟ",
+             font=(FONT, 8), bg="white", fg="#64748B").pack(anchor="w", pady=(2, 0))
+
     hint = tk.Label(
-        root, text="กด Ctrl ขวา ค้างไว้แล้วพูด · ปล่อยเพื่อพิมพ์ · F9 = พูดยาวแบบไม่ต้องกดค้าง",
+        root, text="กดปุ่มที่เลือกค้างไว้แล้วพูด · ปล่อยเพื่อพิมพ์ข้อความ",
         font=(FONT, 9), bg="white", fg="#475569",
     )
     if has_relay and not any(values.get(k) for k, _l, _u in KEYS):
@@ -89,19 +106,24 @@ def run_setup_window() -> bool:
 
         def show_keys(_e=None):
             toggle.pack_forget()
-            keys_frame.pack(anchor="w", fill="x", before=hint)
+            keys_frame.pack(anchor="w", fill="x", before=keys_box)
             root.eval("tk::PlaceWindow . center")
 
         toggle.bind("<Button-1>", show_keys)
         toggle.pack(anchor="w", pady=(0, 12))
     else:
         keys_frame.pack(anchor="w", fill="x")
+    keys_box.pack(anchor="w", fill="x", pady=(0, 14))
     hint.pack(anchor="w", pady=(0, 12))
 
     def save():
         for key, entry in entries.items():
             values[key] = entry.get().strip()
         code = demo.get().strip().upper() if demo is not None else ""
+        chosen = [name for name, var in key_vars.items() if var.get()]
+        if not chosen:
+            messagebox.showwarning(APP_NAME, "กรุณาเลือกปุ่มกดค้างอย่างน้อย 1 ปุ่ม", parent=root)
+            return
         if not code and not values.get("GROQ_API_KEY"):
             messagebox.showwarning(
                 APP_NAME, "กรุณาใส่รหัสทดลอง หรือ Groq API key" if has_relay else "กรุณาใส่ Groq API key", parent=root
@@ -112,6 +134,7 @@ def run_setup_window() -> bool:
         # A personal Groq key wins over a demo code when both are filled in.
         cfg.stt_provider = "groq" if values.get("GROQ_API_KEY") else "relay"
         cfg.demo_code = code
+        cfg.hotkey = ",".join(chosen)
         cfg.save()
         saved["ok"] = True
         root.destroy()

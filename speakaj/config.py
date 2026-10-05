@@ -22,9 +22,11 @@ DEFAULT_RELAY_URL = "https://speakaj-relay.patcharapon-pst.workers.dev"
 
 @dataclass
 class Config:
-    # Push-to-talk key. Any pynput key name ("ctrl_r", "alt_r", "f8", ...) or a
-    # single character. Hold to record, release to transcribe and type.
-    hotkey: str = "ctrl_r"
+    # Push-to-talk keys, comma-separated. Any pynput key name ("ctrl_r",
+    # "pause", "scroll_lock", "f8", ...) or a single character. Hold any of them
+    # to record, release to transcribe and type. Pause is on by default for
+    # keyboards without a right Ctrl.
+    hotkey: str = "ctrl_r,pause"
     # Optional hands-free toggle key: press once to start, again to stop.
     toggle_hotkey: str = "f9"
 

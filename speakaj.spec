@@ -26,6 +26,6 @@ if sys.platform == "darwin":
         info_plist={
             "NSMicrophoneUsageDescription": "Speakaj ใช้ไมโครโฟนเพื่อแปลงเสียงพูดเป็นข้อความ",
             "LSUIElement": True,
-            "CFBundleShortVersionString": "0.2.3",
+            "CFBundleShortVersionString": "0.2.4",
         },
     )
