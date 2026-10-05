@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+import sys
 import time
 from typing import Callable
 
@@ -18,6 +20,25 @@ HOLD_KEY_CHOICES = [
     ("f8", "F8"),
 ]
 KEY_LABELS = dict(HOLD_KEY_CHOICES) | {"alt_r": "Alt ขวา", "f9": "F9", "cmd_r": "Cmd ขวา"}
+if sys.platform == "darwin":  # Mac keyboards have no Pause / Scroll Lock
+    HOLD_KEY_CHOICES = [c for c in HOLD_KEY_CHOICES if c[0] not in ("pause", "scroll_lock")]
+
+log = logging.getLogger(__name__)
+
+
+def _parse_known(names: str) -> list:
+    """Parse each key name, skipping ones this platform doesn't have (the
+    default "ctrl_r,pause" must still start on a Mac)."""
+    keys = []
+    for name in split_keys(names):
+        try:
+            key = parse_key(name)
+        except ValueError:
+            log.warning("Hotkey %r is not available on this platform; ignoring it", name)
+            continue
+        if key is not None:
+            keys.append(key)
+    return keys
 
 
 def split_keys(names: str) -> list[str]:
@@ -51,7 +72,7 @@ class HotkeyListener:
         on_stop: Callable[[], None],
         on_cancel: Callable[[], None],
     ):
-        self.hold_keys = [k for k in (parse_key(n) for n in split_keys(hold_key)) if k is not None]
+        self.hold_keys = _parse_known(hold_key)
         self.toggle_key = parse_key(toggle_key)
         self.on_start = on_start
         self.on_stop = on_stop

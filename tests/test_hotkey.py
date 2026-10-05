@@ -64,13 +64,13 @@ def test_paste_key_is_layout_independent(monkeypatch):
 def test_several_hold_keys():
     events = []
     h = hotkey.HotkeyListener(
-        "ctrl_r, pause", "f9",
+        "ctrl_r, f8, not_a_key", "f9",
         on_start=lambda: events.append("start"),
         on_stop=lambda: events.append("stop"),
         on_cancel=lambda: events.append("cancel"),
     )
-    h._on_press(Key.pause)
-    h._on_release(Key.pause)
+    h._on_press(Key.f8)
+    h._on_release(Key.f8)
     h._on_press(Key.ctrl_r)
     h._on_release(Key.ctrl_r)
     assert events == ["start", "stop", "start", "stop"]
