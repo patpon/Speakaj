@@ -17,7 +17,7 @@ CONFIG_FILE = CONFIG_DIR / "config.json"
 # Demo relay that holds the Groq key for people trying Speakaj with a demo
 # code (see relay/README.md). Set after deploying the relay; config.json's
 # relay_url overrides it.
-DEFAULT_RELAY_URL = ""
+DEFAULT_RELAY_URL = "https://speakaj-relay.patcharapon-pst.workers.dev"
 
 
 @dataclass

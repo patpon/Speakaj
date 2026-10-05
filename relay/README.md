@@ -18,11 +18,11 @@
 6. **Settings → Variables and Secrets → Add** (เลือก Type = **Secret**) 2 ตัว
    - `GROQ_API_KEY` = Groq key ของเรา (`gsk_...`)
    - `ADMIN_TOKEN` = รหัสผ่านสำหรับหน้าจัดการ ตั้งให้ยาวๆ เดายาก
-7. จดลิงก์ Worker เช่น `https://speakaj-relay.ชื่อของคุณ.workers.dev` แล้วส่งให้ Claude ใส่ไว้ในโปรแกรม (`DEFAULT_RELAY_URL` ใน `speakaj/config.py`) แล้วออก release ใหม่
+7. ลิงก์ Worker ของเรา: `https://speakaj-relay.patcharapon-pst.workers.dev` (ใส่ไว้ในโปรแกรมแล้วที่ `DEFAULT_RELAY_URL` ใน `speakaj/config.py`)
 
 ## ใช้งาน
 
-- เปิด `https://speakaj-relay.ชื่อของคุณ.workers.dev/admin` → ใส่ `ADMIN_TOKEN` → **สร้างรหัสทดลอง**
+- เปิด `https://speakaj-relay.patcharapon-pst.workers.dev/admin` → ใส่ `ADMIN_TOKEN` → **สร้างรหัสทดลอง**
 - ส่งรหัสให้ผู้ทดลอง พร้อมลิงก์ดาวน์โหลด `Speakaj-Setup.exe`
 - ผู้ทดลองเปิดโปรแกรมครั้งแรก ใส่รหัสในช่อง **รหัสทดลอง** → ใช้งานได้ทันที
 
