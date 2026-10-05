@@ -51,7 +51,7 @@ def run_setup_window() -> bool:
     tk.Label(root, text="แค่พูด ไม่ต้องพิมพ์", font=(FONT, 16, "bold"), bg="white", fg=BLUE).pack(anchor="w")
     tk.Label(
         root,
-        text="ใส่รหัสทดลอง หรือ Groq API key ของคุณเอง อย่างใดอย่างหนึ่ง" if has_relay
+        text="ใส่รหัสทดลองที่ได้รับ แล้วกดบันทึก" if has_relay
         else "ใส่ Groq API key เพื่อแปลงเสียงเป็นข้อความ (ขอฟรี กดลิงก์ด้านล่าง)",
         font=(FONT, 10), bg="white", fg="#475569",
     ).pack(anchor="w", pady=(2, 14))
@@ -59,26 +59,44 @@ def run_setup_window() -> bool:
     demo = None
     if has_relay:
         tk.Label(root, text="รหัสทดลอง (เช่น DEMO-AB12-CD34)", font=(FONT, 10, "bold"), bg="white").pack(anchor="w")
-        demo = tk.Entry(root, width=52, font=("Consolas", 12))
+        demo = tk.Entry(root, width=34, font=("Consolas", 13), justify="center")
         demo.insert(0, cfg.demo_code)
-        demo.pack(anchor="w", ipady=4, pady=(0, 6))
-        tk.Label(root, text="— หรือ —", font=(FONT, 9), bg="white", fg="#94A3B8").pack(pady=(4, 8))
+        demo.pack(anchor="w", ipady=6, pady=(2, 12), fill="x")
 
+    # With a demo relay the key fields are optional, so they start hidden
+    # behind a link; without one they are the only way in and always show.
+    keys_frame = tk.Frame(root, bg="white")
     entries = {}
     for key, label, url in KEYS:
-        tk.Label(root, text=label, font=(FONT, 10, "bold"), bg="white").pack(anchor="w")
-        entry = tk.Entry(root, width=52, show="•", font=(FONT, 10))
+        if has_relay:
+            label = label.replace("(จำเป็น)", "(ไม่บังคับ)")
+        tk.Label(keys_frame, text=label, font=(FONT, 10, "bold"), bg="white").pack(anchor="w")
+        entry = tk.Entry(keys_frame, width=52, show="•", font=(FONT, 10))
         entry.insert(0, values.get(key, ""))
-        entry.pack(anchor="w", ipady=4)
-        link = tk.Label(root, text=f"ขอ key ที่ {url}", font=(FONT, 9, "underline"), fg=BLUE, bg="white", cursor="hand2")
+        entry.pack(anchor="w", ipady=4, fill="x")
+        link = tk.Label(keys_frame, text=f"ขอ key ที่ {url}", font=(FONT, 9, "underline"), fg=BLUE, bg="white", cursor="hand2")
         link.bind("<Button-1>", lambda _e, u=url: webbrowser.open(u))
         link.pack(anchor="w", pady=(2, 12))
         entries[key] = entry
 
-    tk.Label(
+    hint = tk.Label(
         root, text="กด Ctrl ขวา ค้างไว้แล้วพูด · ปล่อยเพื่อพิมพ์ · F9 = พูดยาวแบบไม่ต้องกดค้าง",
         font=(FONT, 9), bg="white", fg="#475569",
-    ).pack(anchor="w", pady=(0, 12))
+    )
+    if has_relay and not any(values.get(k) for k, _l, _u in KEYS):
+        toggle = tk.Label(root, text="มี API key ของตัวเอง? คลิกที่นี่", font=(FONT, 9, "underline"),
+                          fg="#64748B", bg="white", cursor="hand2")
+
+        def show_keys(_e=None):
+            toggle.pack_forget()
+            keys_frame.pack(anchor="w", fill="x", before=hint)
+            root.eval("tk::PlaceWindow . center")
+
+        toggle.bind("<Button-1>", show_keys)
+        toggle.pack(anchor="w", pady=(0, 12))
+    else:
+        keys_frame.pack(anchor="w", fill="x")
+    hint.pack(anchor="w", pady=(0, 12))
 
     def save():
         for key, entry in entries.items():

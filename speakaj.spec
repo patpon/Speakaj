@@ -23,6 +23,6 @@ else:
             info_plist={
                 "NSMicrophoneUsageDescription": "Speakaj ใช้ไมโครโฟนเพื่อแปลงเสียงพูดเป็นข้อความ",
                 "LSUIElement": True,
-                "CFBundleShortVersionString": "0.2.1",
+                "CFBundleShortVersionString": "0.2.2",
             },
         )
