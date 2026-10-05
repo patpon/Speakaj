@@ -7,22 +7,25 @@ hiddenimports = collect_submodules("speakaj") + collect_submodules("pynput") + [
 if sys.platform != "darwin":
     hiddenimports += collect_submodules("pystray")
 
-a = Analysis(["launcher.py"], hiddenimports=hiddenimports, noarchive=False)
+# Modules nothing in Speakaj uses; leaving them out makes the app smaller.
+excludes = ["matplotlib", "scipy", "pandas", "IPython", "pytest", "unittest", "pydoc", "test"]
+
+a = Analysis(["launcher.py"], hiddenimports=hiddenimports, excludes=excludes, noarchive=False)
 pyz = PYZ(a.pure)
 
-if sys.platform == "win32":
-    exe = EXE(pyz, a.scripts, a.binaries, a.datas, name="Speakaj", console=False, upx=False)
-else:
-    exe = EXE(pyz, a.scripts, exclude_binaries=True, name="Speakaj", console=False)
-    coll = COLLECT(exe, a.binaries, a.datas, name="Speakaj")
-    if sys.platform == "darwin":
-        app = BUNDLE(
-            coll,
-            name="Speakaj.app",
-            bundle_identifier="com.patpon.speakaj",
-            info_plist={
-                "NSMicrophoneUsageDescription": "Speakaj ใช้ไมโครโฟนเพื่อแปลงเสียงพูดเป็นข้อความ",
-                "LSUIElement": True,
-                "CFBundleShortVersionString": "0.2.2",
-            },
-        )
+# One folder (not --onefile) on every platform: a onefile .exe unpacks ~40 MB
+# to a temp folder on every launch, and antivirus rescans it each time, which
+# made startup take many seconds on Windows. The installer ships the folder.
+exe = EXE(pyz, a.scripts, exclude_binaries=True, name="Speakaj", console=False, upx=False)
+coll = COLLECT(exe, a.binaries, a.datas, name="Speakaj", upx=False)
+if sys.platform == "darwin":
+    app = BUNDLE(
+        coll,
+        name="Speakaj.app",
+        bundle_identifier="com.patpon.speakaj",
+        info_plist={
+            "NSMicrophoneUsageDescription": "Speakaj ใช้ไมโครโฟนเพื่อแปลงเสียงพูดเป็นข้อความ",
+            "LSUIElement": True,
+            "CFBundleShortVersionString": "0.2.3",
+        },
+    )

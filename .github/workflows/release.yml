@@ -27,7 +27,7 @@ jobs:
       - run: python build.py
       - name: Zip (Windows)
         if: runner.os == 'Windows'
-        run: Compress-Archive -Path dist/Speakaj.exe, README.md, .env.example -DestinationPath ${{ matrix.asset }}
+        run: Compress-Archive -Path dist/Speakaj, README.md, .env.example -DestinationPath ${{ matrix.asset }}
       - name: Installer (Windows)
         if: runner.os == 'Windows'
         shell: pwsh

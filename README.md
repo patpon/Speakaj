@@ -27,7 +27,7 @@
 
 ### ตัวเลือก A — ดาวน์โหลดไฟล์สำเร็จรูป (ง่ายสุด)
 1. ไปที่ [Releases](https://github.com/patpon/Speakaj/releases) ดาวน์โหลด
-   - Windows: `Speakaj-windows.zip` → แตกไฟล์ → ดับเบิลคลิก `Speakaj.exe`
+   - Windows (แนะนำ): `Speakaj-Setup.exe` → Next จนจบ · หรือ `Speakaj-windows.zip` → แตกไฟล์ → เปิดโฟลเดอร์ `Speakaj` → ดับเบิลคลิก `Speakaj.exe`
    - macOS: `Speakaj-macos.zip` → แตกไฟล์ → ลาก `Speakaj.app` ไปที่ Applications
 2. ครั้งแรกจะถาม API key (ดูหัวข้อถัดไป)
 

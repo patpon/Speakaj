@@ -32,7 +32,7 @@ Name: "desktopicon"; Description: "Create a desktop shortcut"; Flags: checkedonc
 Name: "startup"; Description: "Start Speakaj when Windows starts"; Flags: checkedonce
 
 [Files]
-Source: "..\dist\Speakaj.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\dist\Speakaj\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\Speakaj"; Filename: "{app}\Speakaj.exe"
@@ -46,6 +46,11 @@ Filename: "{app}\Speakaj.exe"; Description: "Start Speakaj now"; Flags: nowait p
 [UninstallRun]
 Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM Speakaj.exe"; Flags: runhidden; RunOnceId: "StopSpeakaj"
 
+[InstallDelete]
+; Leftovers from the old single-file build are replaced by the folder build.
+Type: files; Name: "{app}\Speakaj.exe"
+
 [UninstallDelete]
+Type: filesandordirs; Name: "{app}"
 ; Remove settings, demo code, API keys and history so nothing is left behind.
 Type: filesandordirs; Name: "{%USERPROFILE}\.speakaj"
