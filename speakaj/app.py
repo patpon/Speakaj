@@ -88,7 +88,10 @@ class SpeakajApp:
                 raw, text = process_audio(self.cfg, wav)
             except TranscriptionError as exc:
                 log.error("%s", exc)
-                self.overlay.show("error", str(exc)[:120])
+                msg = str(exc)
+                if "รหัสทดลอง" in msg or "หมดระยะทดลอง" in msg:
+                    msg += " · คลิกขวาไอคอนไมค์ → เปลี่ยนรหัสทดลอง"
+                self.overlay.show("error", msg[:140])
                 sounds.play("error", self.cfg.play_sounds)
                 return
             if not text:
@@ -143,6 +146,7 @@ class SpeakajApp:
             item(lambda _: self._usage_text(), None, enabled=False),
             pystray.Menu.SEPARATOR,
             item("คัดลอกข้อความล่าสุด", lambda: copy_to_clipboard(last_history())),
+            item("เปลี่ยนรหัสทดลอง / API key…", lambda: self.reopen_setup()),
             item("เปิดไฟล์ตั้งค่า", lambda: _open_path(CONFIG_FILE)),
             item("เปิดโฟลเดอร์ประวัติ", lambda: _open_path(CONFIG_DIR)),
             pystray.Menu.SEPARATOR,
@@ -150,6 +154,12 @@ class SpeakajApp:
         )
         self._tray = pystray.Icon(APP_NAME, img, APP_NAME, menu)
         self._tray.run_detached()
+
+    def reopen_setup(self) -> None:
+        """Restart into the setup window, e.g. after typing a wrong demo code."""
+        cmd = [sys.executable] if getattr(sys, "frozen", False) else [sys.executable, "-m", "speakaj"]
+        subprocess.Popen(cmd + ["--setup-gui"], close_fds=True)
+        self.quit()
 
     def quit(self) -> None:
         self.hotkeys.stop()
@@ -177,23 +187,29 @@ class SpeakajApp:
 _instance_socket = None
 
 
-def acquire_single_instance(port: int = 47613) -> bool:
+def acquire_single_instance(port: int = 47613, wait: float = 3.0) -> bool:
     """Hold a localhost port so a second copy (e.g. run.bat clicked twice)
-    doesn't record and send every dictation a second time."""
+    doesn't record and send every dictation a second time. Waits briefly so a
+    restart from the tray menu can take over from the copy that is exiting."""
     global _instance_socket
     import socket
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    if sys.platform == "win32":
-        sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
-    try:
-        sock.bind(("127.0.0.1", port))
-        sock.listen(1)
-    except OSError:
-        sock.close()
-        return False
-    _instance_socket = sock
-    return True
+    deadline = time.monotonic() + wait
+    while True:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if sys.platform == "win32":
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        try:
+            sock.bind(("127.0.0.1", port))
+            sock.listen(1)
+        except OSError:
+            sock.close()
+            if time.monotonic() >= deadline:
+                return False
+            time.sleep(0.25)
+            continue
+        _instance_socket = sock
+        return True
 
 
 def _open_path(path) -> None:

@@ -80,6 +80,7 @@ def _check() -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="speakaj", description=f"{APP_NAME}: แค่พูด ไม่ต้องพิมพ์")
     parser.add_argument("--setup", action="store_true", help="ตั้งค่า API keys และปุ่มลัด")
+    parser.add_argument("--setup-gui", action="store_true", help="เปิดหน้าต่างตั้งค่า (รหัสทดลอง / API key) แล้วเริ่มใช้งาน")
     parser.add_argument("--check", action="store_true", help="ตรวจ API keys และไมโครโฟน")
     parser.add_argument("--file", type=Path, help="แปลงไฟล์เสียง (wav/mp3/m4a) แล้วพิมพ์ผลออกจอ")
     parser.add_argument("--verbose", "-v", action="store_true")
@@ -107,8 +108,8 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     cfg = load_config()
-    if not cfg.api_key(cfg.stt_provider):
-        if sys.stdin is None or not sys.stdin.isatty():
+    if args.setup_gui or not cfg.api_key(cfg.stt_provider):
+        if args.setup_gui or sys.stdin is None or not sys.stdin.isatty():
             # Windowed build: no console to type into, so ask in a window.
             from .setup_gui import run_setup_window
 

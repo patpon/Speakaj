@@ -177,7 +177,7 @@ def test_single_instance(unused_port=47999):
 
     assert app.acquire_single_instance(unused_port)
     first = app._instance_socket
-    assert not app.acquire_single_instance(unused_port)
+    assert not app.acquire_single_instance(unused_port, wait=0)
     first.close()
 
 
