@@ -43,8 +43,22 @@ Name: "{userstartup}\Speakaj"; Filename: "{app}\Speakaj.exe"; Tasks: startup
 [Run]
 Filename: "{app}\Speakaj.exe"; Description: "Start Speakaj now"; Flags: nowait postinstall skipifsilent
 
+[Code]
+// Close a running Speakaj before copying files. Without this an upgrade
+// fails with "MoveFile failed; code 183" because Speakaj.exe is locked
+// (Speakaj lives in the tray, so the Restart Manager cannot close it).
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+var
+  ResultCode: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /T /IM Speakaj.exe', '', SW_HIDE,
+       ewWaitUntilTerminated, ResultCode);
+  Sleep(1500);
+  Result := '';
+end;
+
 [UninstallRun]
-Filename: "{sys}\taskkill.exe"; Parameters: "/F /IM Speakaj.exe"; Flags: runhidden; RunOnceId: "StopSpeakaj"
+Filename: "{sys}\taskkill.exe"; Parameters: "/F /T /IM Speakaj.exe"; Flags: runhidden; RunOnceId: "StopSpeakaj"
 
 [InstallDelete]
 ; Leftovers from the old single-file build are replaced by the folder build.

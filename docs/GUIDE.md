@@ -3,7 +3,7 @@
 > โปรแกรมพิมพ์ด้วยเสียง ภาษาไทย + English สำหรับ Windows และ Mac
 > กดปุ่มค้าง → พูด → ปล่อย ข้อความที่เรียบเรียงแล้วจะพิมพ์ลงช่องที่เคอร์เซอร์อยู่ทันที
 
-**[⬇️ ดาวน์โหลดสำหรับ Windows](https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-Setup.exe)** · [Mac](https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-macos.zip) · เวอร์ชันล่าสุด 0.2.4
+**[⬇️ ดาวน์โหลดสำหรับ Windows](https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-Setup.exe)** · [Mac](https://github.com/patpon/Speakaj/releases/latest/download/Speakaj-macos.zip) · เวอร์ชันล่าสุด 0.2.5
 
 ---
 
@@ -76,7 +76,7 @@
 
 ---
 
-## ส่วนที่ 2 · คู่มือการใช้งาน (เวอร์ชัน 0.2.4)
+## ส่วนที่ 2 · คู่มือการใช้งาน (เวอร์ชัน 0.2.5)
 
 ### 1. ติดตั้ง (Windows)
 
